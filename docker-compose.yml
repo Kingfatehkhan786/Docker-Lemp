@@ -1,0 +1,43 @@
+version: "3.2"
+services:
+  php:
+    build: './PHP-fpm-docker'
+    ports: ["9001:9001"]
+    container_name: PHP
+    networks:
+      - phpngx
+    volumes:
+       - ./public_html/:/var/www/html/
+  nginx:
+    build: './nginx-docker/'
+    ports: ["8080:80"]
+    container_name: Nginx
+    networks:
+      - phpngx
+    volumes:
+        - ./public_html/:/var/www/html/
+  mysql:
+   image: mariadb:10.4
+   restart: always
+   container_name: DB
+   volumes:
+      - mysql-data:/var/lib/mysql
+   environment:
+       MYSQL_ROOT_PASSWORD: IDS@123
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: PMA
+    ports:
+     - 8000:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+    depends_on:
+      - mysql
+
+networks:
+    phpngx:
+volumes:
+  mysql-data:
+
